@@ -1,11 +1,14 @@
 import time
+import numpy as np
 import platform
+import winsound
+import sounddevice as sd
 
 freq = 550 # Hz
 dotLength = 80 # milliseconds
 dashLength = dotLength * 3
 pauseWords = dotLength * 10
-
+sample_rate = 44100  # samples per second
 
 morse_code_dict = {
     "A": ".-",
@@ -58,11 +61,14 @@ def beep(dur):
     :param dur: duration of beep in milliseconds
     """
     if platform.system() == "Windows":
-        import winsound
         winsound.Beep(freq, dur)
     else:
         # For non-Windows systems.
-        pass
+        duration = dur / 1000.0
+        t = np.linspace(0, duration, int(sample_rate * duration), False)
+        waveform = np.sin(2 * np.pi * freq * t)
+        sd.play(waveform, sample_rate, blocking=True)
+
 
 
 def pause(dur):
